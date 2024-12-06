@@ -1,30 +1,32 @@
-const Overview = imports.ui.main.overview;
+const Main = imports.ui.main;
 
 // did we activate the overview?
 let _active = false;
 
 function check() {
-  if (!global.screen.get_active_workspace().list_windows().length) {
+  if (!global.workspace_manager.get_active_workspace().list_windows().length) {
     // workspace empty
-    if (!Overview.visible) {
+    if (!Main.overview.visible) {
       _active = true;
-      Overview.show();
+      Main.overview.show();
     }
   } else {
     // workspace not empty
-    if (Overview.visible && _active) {
+    if (Main.overview.visible && _active) {
       _active = false;
-      Overview.hide();
+      Main.overview.hide();
     }
   }
 }
 
-let _handles = [];
+let _signalIds = [];
 
 function enable() {
-  _handles = ['workspace-switched', 'restacked'].map(s => global.screen.connect(s, check));
+  _signalIds[0] = global.workspace_manager.connect('workspace-switched', check);
+  _signalIds[1] = global.display.connect('restacked', check);
 }
 
 function disable() {
-  _handles.forEach(h => global.screen.disconnect(h));
+  global.workspace_manager.disconnect(_signalIds[0]);
+  global.display.disconnect(_signalIds[1]);
 }
