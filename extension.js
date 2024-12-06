@@ -3,6 +3,11 @@ const Main = imports.ui.main;
 // did we activate the overview?
 let _active = false;
 
+function check_with_delay() {
+  // when switching too fast it causes crash in animations
+  setTimeout(check, 100);
+}
+
 function check() {
   if (!global.workspace_manager.get_active_workspace().list_windows().length) {
     // workspace empty
@@ -22,8 +27,8 @@ function check() {
 let _signalIds = [];
 
 function enable() {
-  _signalIds[0] = global.workspace_manager.connect('workspace-switched', check);
-  _signalIds[1] = global.display.connect('restacked', check);
+  _signalIds[0] = global.workspace_manager.connect('workspace-switched', check_with_delay);
+  _signalIds[1] = global.display.connect('restacked', check_with_delay);
 }
 
 function disable() {
