@@ -11,17 +11,17 @@ function check_workspace_switched() {
   // when switching too fast it causes crash in animations
   setTimeout(function() {
     if (!hasWindowsActive()) {
-    // workspace empty
-    if (!Main.overview.visible) {
-      _active = true;
-      Main.overview.show();
-    }
-  } else {
-    // workspace not empty
-    if (Main.overview.visible && _active) {
-      _active = false;
-      Main.overview.hide();
-    }
+      // workspace empty
+      if (!Main.overview.visible) {
+        _active = true;
+        Main.overview.show();
+      }
+    } else {
+      // workspace not empty
+      if (Main.overview.visible && _active) {
+        _active = false;
+        Main.overview.hide();
+      }
     }
   }, 50);
 }
@@ -42,6 +42,12 @@ function check_window_destroyed() {
 let _signalIds = [];
 
 function enable() {
+  if (!Main.layoutManager._startingUp) {
+    setTimeout(function() {
+      check_window_destroyed() // open overview after hibernation
+    }, 100);
+  }
+
   _signalIds[0] = global.workspace_manager.connect('workspace-switched', check_workspace_switched);
   _signalIds[1] = global.window_manager.connect('destroy', check_window_destroyed);
   _signalIds[2] = global.display.connect('window-created', check_window_created);
