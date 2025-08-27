@@ -4,5 +4,5 @@
   "description": "Activates the overview when switching to an empty workspace",
   "uuid": "overview-when-empty@rliang.github.com",
   "url": "https://github.com/rliang/gnome-shell-extension-overview-when-empty",
-  "shell-version": ["40", "42", "43"]
+  "shell-version": ["45", "46", "47", "48"]
 }

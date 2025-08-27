@@ -1,60 +1,61 @@
-const Main = imports.ui.main;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-// did we activate the overview?
-let _active = false;
+export default class MyTestExtension {
+    // did we activate the overview?
+    _active = false;
+    _signalIds = [];
 
-function hasWindowsActive() {
-  return global.workspace_manager.get_active_workspace().list_windows().length
-}
+    enable() {
+        if (!Main.layoutManager._startingUp) {
+            setTimeout(() => {
+                this.check_window_destroyed(); // open overview after hibernation
+            }, 100);
+        }
 
-function check_workspace_switched() {
-  // when switching too fast it causes crash in animations
-  setTimeout(function() {
-    if (!hasWindowsActive()) {
-      // workspace empty
-      if (!Main.overview.visible) {
-        _active = true;
-        Main.overview.show();
-      }
-    } else {
-      // workspace not empty
-      if (Main.overview.visible && _active) {
-        _active = false;
-        Main.overview.hide();
-      }
+        this._signalIds[0] = global.workspace_manager.connect('workspace-switched', () => this.check_workspace_switched());
+        this._signalIds[1] = global.window_manager.connect('destroy', () => this.check_window_destroyed());
+        this._signalIds[2] = global.display.connect('window-created', () => this.check_window_created());
     }
-  }, 50);
-}
 
-function check_window_created() {
-  if (Main.overview.visible && hasWindowsActive()) { // overview visible and workspace not empty
-    Main.overview.hide();
-  }
-}
+    disable() {
+        global.workspace_manager.disconnect(this._signalIds[0]);
+        global.window_manager.disconnect(this._signalIds[1]);
+        global.display.disconnect(this._signalIds[2]);
+    }
 
-function check_window_destroyed() {
-  if (!Main.overview.visible && !hasWindowsActive()) { // overview not visible and workspace empty
-    _active = true;
-    Main.overview.show();
-  }
-}
+    hasWindowsActive() {
+        return global.workspace_manager.get_active_workspace().list_windows().length > 0;
+    }
 
-let _signalIds = [];
+    check_workspace_switched() {
+        // when switching too fast it causes crash in animations
+        setTimeout(() => {
+            if (!this.hasWindowsActive()) {
+                // workspace empty
+                if (!Main.overview.visible) {
+                    this._active = true;
+                    Main.overview.show();
+                }
+            } else {
+                // workspace not empty
+                if (Main.overview.visible && this._active) {
+                    this._active = false;
+                    Main.overview.hide();
+                }
+            }
+        }, 50);
+    }
 
-function enable() {
-  if (!Main.layoutManager._startingUp) {
-    setTimeout(function() {
-      check_window_destroyed() // open overview after hibernation
-    }, 100);
-  }
+    check_window_created() {
+        if (Main.overview.visible && this.hasWindowsActive()) { // overview visible and workspace not empty
+            Main.overview.hide();
+        }
+    }
 
-  _signalIds[0] = global.workspace_manager.connect('workspace-switched', check_workspace_switched);
-  _signalIds[1] = global.window_manager.connect('destroy', check_window_destroyed);
-  _signalIds[2] = global.display.connect('window-created', check_window_created);
-}
-
-function disable() {
-  global.workspace_manager.disconnect(_signalIds[0]);
-  global.window_manager.disconnect(_signalIds[1]);
-  global.display.disconnect(_signalIds[2]);
+    check_window_destroyed() {
+        if (!Main.overview.visible && !this.hasWindowsActive()) { // overview not visible and workspace empty
+            this._active = true;
+            Main.overview.show();
+        }
+    }
 }
