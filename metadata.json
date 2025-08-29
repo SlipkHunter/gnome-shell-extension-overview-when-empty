@@ -5,4 +5,5 @@
   "uuid": "overview-when-empty@rliang.github.com",
   "url": "https://github.com/SlipkHunter/gnome-shell-extension-overview-when-empty",
   "shell-version": ["45", "46", "47", "48"],
+  "settings-schema": "org.gnome.shell.extensions.overview-when-empty"
 }

@@ -1,12 +1,15 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-export default class OverviewWhenEmptyExtension {
+export default class OverviewWhenEmptyExtension extends Extension {
     // did we activate the overview?
     _active = false;
     _signalIds = [];
 
     enable() {
-        this.showOverviewAfterHibernation()
+        if (this.getSettings().get_boolean("show-overview-after-hibernation")) {
+            this.showOverviewAfterHibernation()
+        }
 
         this._signalIds[0] = global.workspace_manager.connect('workspace-switched', () => this.check_workspace_switched());
         this._signalIds[1] = global.window_manager.connect('destroy', () => this.showOverview());
