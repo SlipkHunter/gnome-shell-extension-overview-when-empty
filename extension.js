@@ -1,20 +1,16 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-export default class MyTestExtension {
+export default class OverviewWhenEmptyExtension {
     // did we activate the overview?
     _active = false;
     _signalIds = [];
 
     enable() {
-        if (!Main.layoutManager._startingUp) {
-            setTimeout(() => {
-                this.check_window_destroyed(); // open overview after hibernation
-            }, 100);
-        }
+        this.showOverviewAfterHibernation()
 
         this._signalIds[0] = global.workspace_manager.connect('workspace-switched', () => this.check_workspace_switched());
-        this._signalIds[1] = global.window_manager.connect('destroy', () => this.check_window_destroyed());
-        this._signalIds[2] = global.display.connect('window-created', () => this.check_window_created());
+        this._signalIds[1] = global.window_manager.connect('destroy', () => this.showOverview());
+        this._signalIds[2] = global.display.connect('window-created', () => this.hideOverview());
     }
 
     disable() {
@@ -25,6 +21,12 @@ export default class MyTestExtension {
 
     hasWindowsActive() {
         return global.workspace_manager.get_active_workspace().list_windows().length > 0;
+    }
+
+    showOverviewAfterHibernation() {
+        if (!Main.layoutManager._startingUp) {
+            setTimeout(() => { this.showOverview(); }, 100);
+        }
     }
 
     check_workspace_switched() {
@@ -46,14 +48,20 @@ export default class MyTestExtension {
         }, 50);
     }
 
-    check_window_created() {
-        if (Main.overview.visible && this.hasWindowsActive()) { // overview visible and workspace not empty
+    /**
+     * Hides overview if it is visible with an active window
+     */
+    hideOverview() {
+        if (Main.overview.visible && this.hasWindowsActive()) {
             Main.overview.hide();
         }
     }
 
-    check_window_destroyed() {
-        if (!Main.overview.visible && !this.hasWindowsActive()) { // overview not visible and workspace empty
+    /**
+     * Shows overview if it is not visible and does not have an active window
+     */
+    showOverview() {
+        if (!Main.overview.visible && !this.hasWindowsActive()) {
             this._active = true;
             Main.overview.show();
         }
