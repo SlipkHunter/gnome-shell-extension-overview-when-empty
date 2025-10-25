@@ -1,5 +1,5 @@
-BUNDLE_PATH = "overview-when-empty@rliang.github.com.zip"
-EXTENSION_DIR = "overview-when-empty@rliang.github.com"
+BUNDLE_PATH = "overview-when-empty@slipkhunter.github.com.zip"
+EXTENSION_DIR = "overview-when-empty@slipkhunter.github.com"
 
 all: build install clean
 
