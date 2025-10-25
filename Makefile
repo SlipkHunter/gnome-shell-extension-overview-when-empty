@@ -5,7 +5,7 @@ all: build install clean
 
 build:
 	rm -f $(BUNDLE_PATH)
-	gnome-extensions pack --force; \
+	gnome-extensions pack --extra-source=LICENSE --force; \
 	mv $(EXTENSION_DIR).shell-extension.zip $(BUNDLE_PATH)
 
 install:
