@@ -2,7 +2,7 @@
   "version": 3,
   "name": "Overview When Empty",
   "description": "Activates the overview when switching to an empty workspace",
-  "uuid": "overview-when-empty@slipkhunter.github.com",
+  "uuid": "overview-when-empty@slipkhunter.github.io",
   "url": "https://github.com/SlipkHunter/gnome-shell-extension-overview-when-empty",
   "shell-version": ["45", "46", "47", "48"],
   "settings-schema": "org.gnome.shell.extensions.overview-when-empty"
